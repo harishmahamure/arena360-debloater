@@ -1,0 +1,2 @@
+$key = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
+if (Test-Path $key) { Write-Output 'applied' } else { Write-Output 'not_applied' }

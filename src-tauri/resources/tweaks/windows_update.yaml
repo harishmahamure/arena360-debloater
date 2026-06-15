@@ -1,0 +1,56 @@
+tweaks:
+  - id: pause-windows-update
+    name: Pause Windows Update
+    category: windows_update
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Pauses Windows Update checks until a far-future date.
+    warning: "Security updates will not install while paused."
+    detectScript: scripts/windows_update/pause-windows-update-detect.ps1
+    applyScript: scripts/windows_update/pause-windows-update-apply.ps1
+    revertScript: scripts/windows_update/pause-windows-update-revert.ps1
+  - id: defer-feature-updates
+    name: Defer Feature Updates
+    category: windows_update
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Defers major Windows feature updates.
+    warning: null
+    detectScript: scripts/windows_update/defer-feature-updates-detect.ps1
+    applyScript: scripts/windows_update/defer-feature-updates-apply.ps1
+    revertScript: scripts/windows_update/defer-feature-updates-revert.ps1
+  - id: disable-wu-auto-restart
+    name: Disable Auto-Restart for Updates
+    category: windows_update
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Prevents automatic reboots while a user is signed in.
+    warning: null
+    detectScript: scripts/windows_update/disable-wu-auto-restart-detect.ps1
+    applyScript: scripts/windows_update/disable-wu-auto-restart-apply.ps1
+    revertScript: scripts/windows_update/disable-wu-auto-restart-revert.ps1
+  - id: limit-wu-bandwidth
+    name: Limit Update Download Bandwidth
+    category: windows_update
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Caps background update download bandwidth to 500 KB/s.
+    warning: null
+    detectScript: scripts/windows_update/limit-wu-bandwidth-detect.ps1
+    applyScript: scripts/windows_update/limit-wu-bandwidth-apply.ps1
+    revertScript: scripts/windows_update/limit-wu-bandwidth-revert.ps1
+  - id: disable-wu-service
+    name: Disable Windows Update Service
+    category: windows_update
+    risk: advanced
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the Windows Update service entirely.
+    warning: "Security updates will not install. Use only if you accept the risk."
+    detectScript: scripts/services/disable-wu-service-detect.ps1
+    applyScript: scripts/services/disable-wu-service-apply.ps1
+    revertScript: scripts/services/disable-wu-service-revert.ps1

@@ -1,0 +1,34 @@
+tweaks:
+  - id: disable-sysmain
+    name: Disable SysMain (Superfetch)
+    category: services
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables SysMain memory preloading.
+    warning: "May slightly reduce performance on HDDs."
+    detectScript: scripts/services/disable-sysmain-detect.ps1
+    applyScript: scripts/services/disable-sysmain-apply.ps1
+    revertScript: scripts/services/disable-sysmain-revert.ps1
+  - id: disable-remote-registry
+    name: Disable Remote Registry
+    category: services
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the Remote Registry service.
+    warning: null
+    detectScript: scripts/services/disable-remote-registry-detect.ps1
+    applyScript: scripts/services/disable-remote-registry-apply.ps1
+    revertScript: scripts/services/disable-remote-registry-revert.ps1
+  - id: disable-xbox-live-auth
+    name: Disable Xbox Live Auth Manager
+    category: services
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables Xbox Live authentication services.
+    warning: null
+    detectScript: scripts/services/disable-xbox-live-auth-detect.ps1
+    applyScript: scripts/services/disable-xbox-live-auth-apply.ps1
+    revertScript: scripts/services/disable-xbox-live-auth-revert.ps1

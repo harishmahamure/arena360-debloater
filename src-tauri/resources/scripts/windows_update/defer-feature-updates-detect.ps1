@@ -1,0 +1,4 @@
+$key = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+if (-not (Test-Path $key)) { Write-Output 'not_applied'; exit 0 }
+$val = Get-ItemProperty -Path $key -Name 'DeferFeatureUpdates' -ErrorAction SilentlyContinue
+if ($val -and $val.'DeferFeatureUpdates' -eq 1) { Write-Output 'applied' } else { Write-Output 'not_applied' }

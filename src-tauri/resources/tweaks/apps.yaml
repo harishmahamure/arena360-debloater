@@ -1,0 +1,78 @@
+tweaks:
+  - id: remove-xbox-app
+    name: Remove Xbox Gaming Overlay
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Xbox Gaming Overlay for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-xbox-app-detect.ps1
+    applyScript: scripts/apps/remove-xbox-app-apply.ps1
+    revertScript: scripts/apps/remove-xbox-app-revert.ps1
+  - id: remove-clipchamp
+    name: Remove Clipchamp
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Clipchamp for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-clipchamp-detect.ps1
+    applyScript: scripts/apps/remove-clipchamp-apply.ps1
+    revertScript: scripts/apps/remove-clipchamp-revert.ps1
+  - id: remove-solitaire
+    name: Remove Microsoft Solitaire
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Microsoft Solitaire for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-solitaire-detect.ps1
+    applyScript: scripts/apps/remove-solitaire-apply.ps1
+    revertScript: scripts/apps/remove-solitaire-revert.ps1
+  - id: remove-news
+    name: Remove Microsoft News
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Microsoft News for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-news-detect.ps1
+    applyScript: scripts/apps/remove-news-apply.ps1
+    revertScript: scripts/apps/remove-news-revert.ps1
+  - id: remove-weather
+    name: Remove Microsoft Weather
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Microsoft Weather for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-weather-detect.ps1
+    applyScript: scripts/apps/remove-weather-apply.ps1
+    revertScript: scripts/apps/remove-weather-revert.ps1
+  - id: remove-get-help
+    name: Remove Get Help
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Get Help for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-get-help-detect.ps1
+    applyScript: scripts/apps/remove-get-help-apply.ps1
+    revertScript: scripts/apps/remove-get-help-revert.ps1
+  - id: remove-phone-link
+    name: Remove Phone Link
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Remove Phone Link for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-phone-link-detect.ps1
+    applyScript: scripts/apps/remove-phone-link-apply.ps1
+    revertScript: scripts/apps/remove-phone-link-revert.ps1

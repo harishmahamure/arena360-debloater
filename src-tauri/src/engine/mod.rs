@@ -1,0 +1,21 @@
+pub mod app_uninstaller;
+pub mod catalog;
+pub mod elevation;
+pub mod error;
+pub mod executor;
+pub mod installed_app_scanner;
+pub mod logger;
+pub mod models;
+pub mod paths;
+pub mod powershell;
+pub mod presets;
+pub mod protected;
+pub mod registry;
+pub mod resource_remover;
+pub mod resource_scanner;
+pub mod reverter;
+pub mod scanner;
+
+pub use catalog::{load_catalog, TweakCatalog};
+pub use error::EngineError;
+pub use presets::{load_presets, PresetCatalog};

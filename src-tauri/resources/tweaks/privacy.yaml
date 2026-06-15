@@ -1,0 +1,56 @@
+tweaks:
+  - id: disable-diagtrack
+    name: Disable Diagnostic Tracking
+    category: privacy
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the DiagTrack telemetry service.
+    warning: null
+    detectScript: scripts/services/disable-diagtrack-detect.ps1
+    applyScript: scripts/services/disable-diagtrack-apply.ps1
+    revertScript: scripts/services/disable-diagtrack-revert.ps1
+  - id: disable-advertising-id
+    name: Disable Advertising ID
+    category: privacy
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the Windows advertising ID used for tailored ads.
+    warning: null
+    detectScript: scripts/privacy/disable-advertising-id-detect.ps1
+    applyScript: scripts/privacy/disable-advertising-id-apply.ps1
+    revertScript: scripts/privacy/disable-advertising-id-revert.ps1
+  - id: disable-activity-history
+    name: Disable Activity History
+    category: privacy
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Stops Windows from collecting and publishing activity history.
+    warning: null
+    detectScript: scripts/privacy/disable-activity-history-detect.ps1
+    applyScript: scripts/privacy/disable-activity-history-apply.ps1
+    revertScript: scripts/privacy/disable-activity-history-revert.ps1
+  - id: disable-tailored-experiences
+    name: Disable Tailored Experiences
+    category: privacy
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables personalized tips and recommendations based on diagnostic data.
+    warning: null
+    detectScript: scripts/privacy/disable-tailored-experiences-detect.ps1
+    applyScript: scripts/privacy/disable-tailored-experiences-apply.ps1
+    revertScript: scripts/privacy/disable-tailored-experiences-revert.ps1
+  - id: disable-location-tracking
+    name: Disable Location Tracking
+    category: privacy
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Denies location access at the system policy level.
+    warning: "May affect apps that rely on location services."
+    detectScript: scripts/privacy/disable-location-tracking-detect.ps1
+    applyScript: scripts/privacy/disable-location-tracking-apply.ps1
+    revertScript: scripts/privacy/disable-location-tracking-revert.ps1

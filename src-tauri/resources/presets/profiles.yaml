@@ -1,0 +1,47 @@
+presets:
+  - id: light
+    name: Light Debloat
+    description: Safe tweaks for casual users — removes obvious bloat and Start ads.
+    targetUser: Casual
+    tweakIds:
+      - remove-xbox-app
+      - remove-clipchamp
+      - remove-solitaire
+      - disable-widgets
+      - disable-chat-taskbar
+      - disable-start-recommendations
+      - disable-lock-screen-tips
+      - clear-temp-files
+      - enable-storage-sense
+
+  - id: privacy
+    name: Privacy Focused
+    description: Disables telemetry, ads, and tracking while keeping system stability.
+    targetUser: Privacy-focused
+    tweakIds:
+      - disable-diagtrack
+      - disable-advertising-id
+      - disable-activity-history
+      - disable-tailored-experiences
+      - disable-location-tracking
+      - disable-start-recommendations
+      - disable-lock-screen-tips
+      - disable-ceip-task
+      - disable-feedback-task
+
+  - id: gaming
+    name: Gaming Profile
+    description: Removes Xbox bloat, optimizes services, and reduces background overhead.
+    targetUser: Gamers
+    tweakIds:
+      - remove-xbox-app
+      - remove-clipchamp
+      - remove-news
+      - remove-weather
+      - disable-sysmain
+      - disable-xbox-live-auth
+      - disable-widgets
+      - disable-chat-taskbar
+      - disable-copilot-button
+      - clear-temp-files
+      - clear-delivery-optimization

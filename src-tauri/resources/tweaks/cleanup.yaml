@@ -1,0 +1,56 @@
+tweaks:
+  - id: clear-temp-files
+    name: Clear Temporary Files
+    category: cleanup
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes user and system temporary files.
+    warning: null
+    detectScript: scripts/cleanup/clear-temp-files-detect.ps1
+    applyScript: scripts/cleanup/clear-temp-files-apply.ps1
+    revertScript: scripts/cleanup/clear-temp-files-revert.ps1
+  - id: clear-update-cache
+    name: Clear Windows Update Cache
+    category: cleanup
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Stops Windows Update and clears the SoftwareDistribution download cache.
+    warning: null
+    detectScript: scripts/cleanup/clear-update-cache-detect.ps1
+    applyScript: scripts/cleanup/clear-update-cache-apply.ps1
+    revertScript: scripts/cleanup/clear-update-cache-revert.ps1
+  - id: enable-storage-sense
+    name: Enable Storage Sense
+    category: cleanup
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Enables Storage Sense to automatically clean temporary files.
+    warning: null
+    detectScript: scripts/cleanup/enable-storage-sense-detect.ps1
+    applyScript: scripts/cleanup/enable-storage-sense-apply.ps1
+    revertScript: scripts/cleanup/enable-storage-sense-revert.ps1
+  - id: dism-component-cleanup
+    name: DISM Component Cleanup
+    category: cleanup
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Runs DISM StartComponentCleanup to reduce WinSxS store size.
+    warning: null
+    detectScript: scripts/cleanup/dism-component-cleanup-detect.ps1
+    applyScript: scripts/cleanup/dism-component-cleanup-apply.ps1
+    revertScript: scripts/cleanup/dism-component-cleanup-revert.ps1
+  - id: clear-delivery-optimization
+    name: Clear Delivery Optimization Cache
+    category: cleanup
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Clears the Delivery Optimization download cache.
+    warning: null
+    detectScript: scripts/cleanup/clear-delivery-optimization-detect.ps1
+    applyScript: scripts/cleanup/clear-delivery-optimization-apply.ps1
+    revertScript: scripts/cleanup/clear-delivery-optimization-revert.ps1

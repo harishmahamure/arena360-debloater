@@ -1,0 +1,67 @@
+tweaks:
+  - id: disable-widgets
+    name: Remove Widgets from Taskbar
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Hides the Widgets button from the Windows 11 taskbar.
+    warning: null
+    detectScript: scripts/ui/disable-widgets-detect.ps1
+    applyScript: scripts/ui/disable-widgets-apply.ps1
+    revertScript: scripts/ui/disable-widgets-revert.ps1
+  - id: disable-chat-taskbar
+    name: Remove Chat from Taskbar
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Hides the Chat / Teams consumer button from the taskbar.
+    warning: null
+    detectScript: scripts/ui/disable-chat-taskbar-detect.ps1
+    applyScript: scripts/ui/disable-chat-taskbar-apply.ps1
+    revertScript: scripts/ui/disable-chat-taskbar-revert.ps1
+  - id: disable-start-recommendations
+    name: Disable Start Menu Recommendations
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes promoted apps and recommendations from the Start menu.
+    warning: null
+    detectScript: scripts/ui/disable-start-recommendations-detect.ps1
+    applyScript: scripts/ui/disable-start-recommendations-apply.ps1
+    revertScript: scripts/ui/disable-start-recommendations-revert.ps1
+  - id: classic-context-menu
+    name: Enable Classic Context Menu
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Restores the full right-click context menu without 'Show more options'.
+    warning: null
+    detectScript: scripts/ui/classic-context-menu-detect.ps1
+    applyScript: scripts/ui/classic-context-menu-apply.ps1
+    revertScript: scripts/ui/classic-context-menu-revert.ps1
+  - id: disable-copilot-button
+    name: Disable Copilot Button
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Hides the Copilot button from the taskbar on supported builds.
+    warning: null
+    detectScript: scripts/ui/disable-copilot-button-detect.ps1
+    applyScript: scripts/ui/disable-copilot-button-apply.ps1
+    revertScript: scripts/ui/disable-copilot-button-revert.ps1
+  - id: disable-lock-screen-tips
+    name: Disable Lock Screen Tips
+    category: ui
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables tips and fun facts on the lock screen.
+    warning: null
+    detectScript: scripts/ui/disable-lock-screen-tips-detect.ps1
+    applyScript: scripts/ui/disable-lock-screen-tips-apply.ps1
+    revertScript: scripts/ui/disable-lock-screen-tips-revert.ps1

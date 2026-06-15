@@ -1,0 +1,34 @@
+tweaks:
+  - id: disable-ceip-task
+    name: Disable CEIP Scheduled Task
+    category: tasks
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the Customer Experience Improvement Program task.
+    warning: null
+    detectScript: scripts/tasks/disable-ceip-task-detect.ps1
+    applyScript: scripts/tasks/disable-ceip-task-apply.ps1
+    revertScript: scripts/tasks/disable-ceip-task-revert.ps1
+  - id: disable-feedback-task
+    name: Disable Feedback Scheduled Task
+    category: tasks
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables the feedback notification scheduled task.
+    warning: null
+    detectScript: scripts/tasks/disable-feedback-task-detect.ps1
+    applyScript: scripts/tasks/disable-feedback-task-apply.ps1
+    revertScript: scripts/tasks/disable-feedback-task-revert.ps1
+  - id: disable-onedrive-startup
+    name: Disable OneDrive Startup
+    category: tasks
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes OneDrive from startup programs.
+    warning: null
+    detectScript: scripts/tasks/disable-onedrive-startup-detect.ps1
+    applyScript: scripts/tasks/disable-onedrive-startup-apply.ps1
+    revertScript: scripts/tasks/disable-onedrive-startup-revert.ps1
