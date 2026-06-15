@@ -1,0 +1,67 @@
+tweaks:
+  - id: disable-game-dvr
+    name: Disable Game DVR / Xbox Capture
+    category: gaming
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Turns off background game recording and Xbox Game Bar capture hooks that can reduce FPS.
+    warning: null
+    detectScript: scripts/gaming/disable-game-dvr-detect.ps1
+    applyScript: scripts/gaming/disable-game-dvr-apply.ps1
+    revertScript: scripts/gaming/disable-game-dvr-revert.ps1
+  - id: enable-game-mode
+    name: Enable Game Mode
+    category: gaming
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Ensures Windows Game Mode is enabled to prioritize game processes.
+    warning: null
+    detectScript: scripts/gaming/enable-game-mode-detect.ps1
+    applyScript: scripts/gaming/enable-game-mode-apply.ps1
+    revertScript: scripts/gaming/enable-game-mode-revert.ps1
+  - id: disable-transparency
+    name: Disable Transparency & Animations
+    category: gaming
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables window transparency and minimize animations to reduce compositor GPU load.
+    warning: null
+    detectScript: scripts/gaming/disable-transparency-detect.ps1
+    applyScript: scripts/gaming/disable-transparency-apply.ps1
+    revertScript: scripts/gaming/disable-transparency-revert.ps1
+  - id: disable-background-apps
+    name: Disable Background Apps
+    category: gaming
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Prevents Store apps from running in the background when not in use.
+    warning: null
+    detectScript: scripts/gaming/disable-background-apps-detect.ps1
+    applyScript: scripts/gaming/disable-background-apps-apply.ps1
+    revertScript: scripts/gaming/disable-background-apps-revert.ps1
+  - id: enable-high-performance-power
+    name: Switch to High Performance Power Plan
+    category: gaming
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Activates High Performance or Ultimate Performance power plan for sustained CPU/GPU clocks.
+    warning: null
+    detectScript: scripts/gaming/enable-high-performance-power-detect.ps1
+    applyScript: scripts/gaming/enable-high-performance-power-apply.ps1
+    revertScript: scripts/gaming/enable-high-performance-power-revert.ps1
+  - id: disable-fullscreen-optimizations
+    name: Disable Fullscreen Optimizations (Global)
+    category: gaming
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables DXGI fullscreen optimizations globally. May help or hurt FPS depending on the game.
+    warning: Test per game — some titles perform worse with FSO disabled.
+    detectScript: scripts/gaming/disable-fullscreen-optimizations-detect.ps1
+    applyScript: scripts/gaming/disable-fullscreen-optimizations-apply.ps1
+    revertScript: scripts/gaming/disable-fullscreen-optimizations-revert.ps1

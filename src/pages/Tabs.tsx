@@ -46,3 +46,25 @@ export function WindowsUpdatePage() {
     />
   );
 }
+
+export function GamingPage() {
+  return (
+    <CategoryPage
+      category="gaming"
+      title="Gaming & FPS"
+      description="Game Mode, capture settings, power plan, and other FPS-oriented tweaks."
+      groupByRisk
+    />
+  );
+}
+
+export function PerformancePage() {
+  return (
+    <CategoryPage
+      category="performance"
+      title="Performance"
+      description="CPU, RAM, network, and disk optimizations — indexing, uploads, hibernate, and compact OS."
+      groupByRisk
+    />
+  );
+}

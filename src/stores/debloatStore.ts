@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { api } from "../lib/tauri";
 import type {
   ApplyResult,
+  CleanupSummary,
   InstalledAppsReport,
   Preset,
   PreviewAppUninstall,
@@ -13,6 +14,15 @@ import type {
   TasksStartupReport,
   Tweak,
 } from "../lib/types";
+import {
+  buildAppCleanupSummary,
+  buildPresetCleanupSummary,
+  buildResourceCleanupSummary,
+  buildTweakCleanupSummary,
+} from "../lib/cleanupSummary";
+
+let runScanInFlight: Promise<void> | null = null;
+let scanResourcesInFlight: Promise<void> | null = null;
 
 interface DebloatState {
   activeTab: TabId;
@@ -29,6 +39,7 @@ interface DebloatState {
   presets: Preset[];
   currentSession: string | null;
   lastApplyResult: ApplyResult | null;
+  lastCleanupSummary: CleanupSummary | null;
   tasksReport: TasksStartupReport | null;
   setTab: (tab: TabId) => void;
   init: () => Promise<void>;
@@ -41,15 +52,20 @@ interface DebloatState {
   selectAll: (ids: string[]) => void;
   selectAllResources: (ids: string[]) => void;
   clearSelection: () => void;
+  ensureElevated: () => Promise<boolean>;
   applySelected: () => Promise<void>;
   applyPresetById: (presetId: string) => Promise<void>;
   previewResourceAction: (action: ResourceAction) => Promise<PreviewResourceItem[]>;
-  applyResourceAction: (action: ResourceAction) => Promise<void>;
+  applyResourceAction: (
+    action: ResourceAction,
+    preview?: PreviewResourceItem[],
+  ) => Promise<void>;
   toggleAppSelection: (id: string) => void;
   selectAllApps: (ids: string[]) => void;
   scanInstalledApps: () => Promise<void>;
   previewAppUninstall: () => Promise<PreviewAppUninstall[]>;
-  bulkUninstallApps: () => Promise<void>;
+  bulkUninstallApps: (preview?: PreviewAppUninstall[]) => Promise<void>;
+  clearCleanupSummary: () => void;
   revertCurrentSession: () => Promise<void>;
   loadTasksReport: () => Promise<void>;
 }
@@ -69,6 +85,7 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
   presets: [],
   currentSession: null,
   lastApplyResult: null,
+  lastCleanupSummary: null,
   tasksReport: null,
 
   setTab: (tab) => set({ activeTab: tab }),
@@ -105,22 +122,52 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
   },
 
   runScan: async () => {
-    set({ loading: true, error: null });
+    if (runScanInFlight) return runScanInFlight;
+
+    runScanInFlight = (async () => {
+      set({ loading: true, error: null });
+      try {
+        const [scanReport, tweaks, resourceReport] = await Promise.all([
+          api.scanSystem(),
+          api.getCatalog(),
+          api.scanResourceUsage({ sampleSecs: 5 }).catch(() => null),
+        ]);
+        set({
+          scanReport,
+          tweaks,
+          resourceReport: resourceReport ?? get().resourceReport,
+          selectedResourceIds: new Set(),
+          loading: false,
+        });
+      } catch (e) {
+        set({ error: String(e), loading: false });
+      }
+    })();
+
     try {
-      const scanReport = await api.scanSystem();
-      set({ scanReport, loading: false });
-    } catch (e) {
-      set({ error: String(e), loading: false });
+      await runScanInFlight;
+    } finally {
+      runScanInFlight = null;
     }
   },
 
   scanResources: async () => {
-    set({ loading: true, error: null });
+    if (scanResourcesInFlight) return scanResourcesInFlight;
+
+    scanResourcesInFlight = (async () => {
+      set({ loading: true, error: null });
+      try {
+        const resourceReport = await api.scanResourceUsage({ sampleSecs: 5 });
+        set({ resourceReport, loading: false, selectedResourceIds: new Set() });
+      } catch (e) {
+        set({ error: String(e), loading: false });
+      }
+    })();
+
     try {
-      const resourceReport = await api.scanResourceUsage({ sampleSecs: 5 });
-      set({ resourceReport, loading: false, selectedResourceIds: new Set() });
-    } catch (e) {
-      set({ error: String(e), loading: false });
+      await scanResourcesInFlight;
+    } finally {
+      scanResourcesInFlight = null;
     }
   },
 
@@ -144,12 +191,26 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
 
   clearSelection: () => set({ selectedIds: new Set() }),
 
+  ensureElevated: async () => {
+    if (get().elevated) return true;
+    const ok = window.confirm(
+      "Applying debloat changes requires Administrator privileges. Restart the app as Administrator now?",
+    );
+    if (!ok) return false;
+    try {
+      await api.requestElevation();
+    } catch (e) {
+      set({ error: String(e) });
+    }
+    return false;
+  },
+
   applySelected: async () => {
     const ids = Array.from(get().selectedIds);
     if (ids.length === 0) return;
+    if (!(await get().ensureElevated())) return;
     set({ loading: true, error: null });
     try {
-      await api.createRestorePoint("Debloater Session");
       const preview = await api.previewChanges(ids);
       const advanced = preview.some((p) => p.risk === "advanced");
       if (advanced) {
@@ -164,6 +225,7 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
       const result = await api.applyTweaks(ids, true);
       set({
         lastApplyResult: result,
+        lastCleanupSummary: buildTweakCleanupSummary(result, preview),
         currentSession: result.sessionId,
         loading: false,
         selectedIds: new Set(),
@@ -176,12 +238,17 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
   },
 
   applyPresetById: async (presetId) => {
+    if (!(await get().ensureElevated())) return;
     set({ loading: true, error: null });
     try {
-      await api.createRestorePoint(`Debloater Preset: ${presetId}`);
+      const preset = get().presets.find((p) => p.id === presetId);
+      const allTweaks = await api.getCatalog();
       const result = await api.applyPreset(presetId, true);
       set({
         lastApplyResult: result,
+        lastCleanupSummary: preset
+          ? buildPresetCleanupSummary(result, preset, allTweaks)
+          : buildTweakCleanupSummary(result, [], `${presetId} applied`),
         currentSession: result.sessionId,
         loading: false,
       });
@@ -197,15 +264,19 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
     return api.previewResourceActions(ids, action);
   },
 
-  applyResourceAction: async (action) => {
+  applyResourceAction: async (action, previewItems) => {
     const ids = Array.from(get().selectedResourceIds);
     if (ids.length === 0) return;
+    if (!(await get().ensureElevated())) return;
     set({ loading: true, error: null });
     try {
-      await api.createRestorePoint("Debloater Resource Action");
+      const preview = previewItems ?? (await api.previewResourceActions(ids, action));
+      const entries =
+        get().resourceReport?.entries.filter((e) => ids.includes(e.id)) ?? [];
       const result = await api.applyResourceActions(ids, action, true);
       set({
         lastApplyResult: result,
+        lastCleanupSummary: buildResourceCleanupSummary(result, action, preview, entries),
         currentSession: result.sessionId,
         loading: false,
         selectedResourceIds: new Set(),
@@ -240,14 +311,19 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
     return api.previewAppUninstall(ids);
   },
 
-  bulkUninstallApps: async () => {
+  bulkUninstallApps: async (previewItems) => {
     const ids = Array.from(get().selectedAppIds);
     if (ids.length === 0) return;
+    if (!(await get().ensureElevated())) return;
     set({ loading: true, error: null });
     try {
+      const preview = previewItems ?? (await api.previewAppUninstall(ids));
+      const apps =
+        get().installedAppsReport?.apps.filter((a) => ids.includes(a.id)) ?? [];
       const result = await api.bulkUninstallApps(ids, true);
       set({
         lastApplyResult: result,
+        lastCleanupSummary: buildAppCleanupSummary(result, preview, apps),
         currentSession: result.sessionId,
         loading: false,
         selectedAppIds: new Set(),
@@ -259,13 +335,15 @@ export const useDebloatStore = create<DebloatState>((set, get) => ({
     }
   },
 
+  clearCleanupSummary: () => set({ lastCleanupSummary: null }),
+
   revertCurrentSession: async () => {
     const sessionId = get().currentSession;
     if (!sessionId) return;
     set({ loading: true, error: null });
     try {
       await api.revertSession(sessionId);
-      set({ currentSession: null, loading: false });
+      set({ currentSession: null, lastCleanupSummary: null, loading: false });
       await get().runScan();
       await get().scanResources();
     } catch (e) {

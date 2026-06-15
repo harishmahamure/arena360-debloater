@@ -37,6 +37,7 @@ export interface PreviewItem {
   category: string;
   risk: RiskLevel;
   action: string;
+  description: string;
   scriptPath: string;
   warning: string | null;
 }
@@ -55,6 +56,25 @@ export interface ApplyResult {
   requiresReboot: boolean;
 }
 
+export type CleanupKind = "tweaks" | "preset" | "resources" | "apps";
+
+export interface CleanupSummaryItem {
+  id: string;
+  name: string;
+  action: string;
+  benefit: string;
+  success: boolean;
+  detail?: string;
+}
+
+export interface CleanupSummary {
+  kind: CleanupKind;
+  title: string;
+  result: ApplyResult;
+  items: CleanupSummaryItem[];
+  benefits: string[];
+}
+
 export interface RevertResult {
   sessionId: string;
   revertedCount: number;
@@ -70,6 +90,8 @@ export interface PresetSummary {
   cleanup: number;
   windowsUpdate: number;
   tasks: number;
+  gaming: number;
+  performance: number;
   total: number;
 }
 
@@ -107,6 +129,8 @@ export type TabId =
   | "privacy"
   | "services"
   | "cleanup"
+  | "gaming"
+  | "performance"
   | "presets"
   | "windows_update"
   | "tasks"
@@ -126,6 +150,14 @@ export interface ResourceEntry {
   cpuPercent: number;
   ramMb: number;
   gpuPercent: number;
+  gpuCopyPercent?: number;
+  gpu3dPercent?: number;
+  gpuVideoPercent?: number;
+  gpuTopEngine?: string | null;
+  diskMbps?: number;
+  diskReadMbps?: number;
+  diskWriteMbps?: number;
+  networkConnections?: number;
   canStop: boolean;
   canUninstall: boolean;
   isProtected: boolean;

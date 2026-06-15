@@ -8,6 +8,7 @@ use crate::engine::resource_scanner::{self, ResourceScanner};
 use crate::state::AppState;
 
 #[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ScanResourceOptions {
     pub sample_secs: Option<u32>,
     pub min_cpu: Option<f64>,
@@ -15,6 +16,7 @@ pub struct ScanResourceOptions {
 }
 
 #[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ApplyResourceOptions {
     pub entry_ids: Vec<String>,
     pub action: ResourceAction,

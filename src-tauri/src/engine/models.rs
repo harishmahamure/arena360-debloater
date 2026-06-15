@@ -92,6 +92,7 @@ pub struct PreviewItem {
     pub category: String,
     pub risk: RiskLevel,
     pub action: String,
+    pub description: String,
     pub script_path: String,
     pub warning: Option<String>,
 }
@@ -133,6 +134,8 @@ pub struct PresetSummary {
     pub cleanup: u32,
     pub windows_update: u32,
     pub tasks: u32,
+    pub gaming: u32,
+    pub performance: u32,
     pub total: u32,
 }
 
@@ -219,6 +222,22 @@ pub struct ResourceEntry {
     pub cpu_percent: f64,
     pub ram_mb: f64,
     pub gpu_percent: f64,
+    #[serde(default)]
+    pub gpu_copy_percent: f64,
+    #[serde(default)]
+    pub gpu_3d_percent: f64,
+    #[serde(default)]
+    pub gpu_video_percent: f64,
+    #[serde(default)]
+    pub gpu_top_engine: Option<String>,
+    #[serde(default)]
+    pub disk_mbps: f64,
+    #[serde(default)]
+    pub disk_read_mbps: f64,
+    #[serde(default)]
+    pub disk_write_mbps: f64,
+    #[serde(default)]
+    pub network_connections: u32,
     pub can_stop: bool,
     pub can_uninstall: bool,
     pub is_protected: bool,

@@ -56,10 +56,12 @@ impl ProtectedRegistry {
 
     pub fn apply_apps(&self, apps: &mut [InstalledApp]) {
         for app in apps.iter_mut() {
-            if self.is_protected_app(app) {
+            if self.is_protected_app(app) || app.is_protected {
                 app.is_protected = true;
                 app.can_uninstall = false;
-                app.warning = Some("Protected system application — cannot uninstall".into());
+                app.warning = app.warning.clone().or(Some(
+                    "Protected system application — cannot uninstall".into(),
+                ));
                 app.risk = RiskLevel::Advanced;
                 continue;
             }
@@ -111,17 +113,24 @@ impl ProtectedRegistry {
             }
         }
 
+        if let Some(pkg) = &entry.package_name {
+            if self.is_protected_package(pkg) {
+                return true;
+            }
+        }
+
         false
+    }
+
+    fn is_protected_package(&self, pkg: &str) -> bool {
+        self.list.package_names.iter().any(|p| {
+            p.eq_ignore_ascii_case(pkg) || pkg.starts_with(p.as_str())
+        })
     }
 
     fn is_protected_app(&self, app: &InstalledApp) -> bool {
         if let Some(pkg) = &app.package_name {
-            if self
-                .list
-                .package_names
-                .iter()
-                .any(|p| p.eq_ignore_ascii_case(pkg) || pkg.starts_with(p))
-            {
+            if self.is_protected_package(pkg) {
                 return true;
             }
         }
@@ -206,6 +215,14 @@ mod tests {
             cpu_percent: 1.0,
             ram_mb: 100.0,
             gpu_percent: 0.0,
+            gpu_copy_percent: 0.0,
+            gpu_3d_percent: 0.0,
+            gpu_video_percent: 0.0,
+            gpu_top_engine: None,
+            disk_mbps: 0.0,
+            disk_read_mbps: 0.0,
+            disk_write_mbps: 0.0,
+            network_connections: 0,
             can_stop: true,
             can_uninstall: false,
             is_protected: false,

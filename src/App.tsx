@@ -5,6 +5,8 @@ import { DashboardPage } from "./pages/Dashboard";
 import {
   AppsPage,
   CleanupPage,
+  GamingPage,
+  PerformancePage,
   PrivacyPage,
   ServicesPage,
   WindowsUpdatePage,
@@ -12,6 +14,7 @@ import {
 import { PresetsPage } from "./pages/Presets";
 import { TasksStartupPage } from "./pages/TasksStartup";
 import { BackgroundUsagePage } from "./pages/BackgroundUsage";
+import { CleanupResultModal } from "./components/CleanupResultModal";
 import type { TabId } from "./lib/types";
 
 const NAV: { id: TabId; label: string }[] = [
@@ -21,6 +24,8 @@ const NAV: { id: TabId; label: string }[] = [
   { id: "privacy", label: "Privacy" },
   { id: "services", label: "Services" },
   { id: "cleanup", label: "Cleanup" },
+  { id: "gaming", label: "Gaming" },
+  { id: "performance", label: "Performance" },
   { id: "presets", label: "Presets" },
   { id: "windows_update", label: "Windows Update" },
   { id: "tasks", label: "Tasks & Startup" },
@@ -36,15 +41,15 @@ function App() {
     revertCurrentSession,
     loading,
     runScan,
-    scanResources,
+    lastCleanupSummary,
+    clearCleanupSummary,
   } = useDebloatStore();
 
   useEffect(() => {
     init().then(() => {
       runScan();
-      scanResources();
     });
-  }, [init, runScan, scanResources]);
+  }, [init, runScan]);
 
   const renderPage = () => {
     switch (activeTab) {
@@ -58,6 +63,10 @@ function App() {
         return <ServicesPage />;
       case "cleanup":
         return <CleanupPage />;
+      case "gaming":
+        return <GamingPage />;
+      case "performance":
+        return <PerformancePage />;
       case "presets":
         return <PresetsPage />;
       case "windows_update":
@@ -124,6 +133,11 @@ function App() {
         </header>
         <main className="flex-1 overflow-auto p-6">{renderPage()}</main>
       </div>
+
+      <CleanupResultModal
+        summary={lastCleanupSummary}
+        onDismiss={clearCleanupSummary}
+      />
     </div>
   );
 }

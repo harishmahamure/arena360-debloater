@@ -16,6 +16,8 @@ export function PresetCard({ preset, onApply, loading }: Props) {
     summary.cleanup > 0 && `${summary.cleanup} cleanup`,
     summary.windowsUpdate > 0 && `${summary.windowsUpdate} WU`,
     summary.tasks > 0 && `${summary.tasks} tasks`,
+    summary.gaming > 0 && `${summary.gaming} gaming`,
+    summary.performance > 0 && `${summary.performance} performance`,
   ].filter(Boolean);
 
   return (

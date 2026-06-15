@@ -1,20 +1,32 @@
 param([string]$AppJson)
 
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'SilentlyContinue'
+. (Join-Path $PSScriptRoot 'appx-remove-helper.ps1')
+
 $app = $AppJson | ConvertFrom-Json
 
 if ($app.appType -eq 'appx' -and $app.packageName) {
-    Get-AppxPackage -Name $app.packageName -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
-    if (-not $?) {
-        Get-AppxPackage -Name $app.packageName -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
+    $result = Remove-SafeAppxPackage -PackageName $app.packageName -AllUsers
+    switch ($result.status) {
+        'removed' { Write-Output "uninstalled_appx:$($app.packageName)"; exit 0 }
+        'not_installed' { Write-Output "uninstalled_appx:$($app.packageName)"; exit 0 }
+        'system_app_cannot_remove' {
+            Write-Output 'system_app_cannot_remove:This app is part of Windows and cannot be uninstalled.'
+            exit 1
+        }
+        default {
+            Write-Output 'no_uninstaller_found'
+            exit 1
+        }
     }
-    Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like "*$($app.packageName)*" | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
-    Write-Output "uninstalled_appx:$($app.packageName)"
-    exit 0
 }
 
 if ($app.appType -eq 'win32' -and $app.uninstallKey) {
-    $key = Get-ItemProperty -Path $app.uninstallKey -ErrorAction Stop
+    $key = Get-ItemProperty -Path $app.uninstallKey -ErrorAction SilentlyContinue
+    if (-not $key) {
+        Write-Output 'no_uninstaller_found'
+        exit 1
+    }
     $uninstall = $key.UninstallString
     if (-not $uninstall) {
         Write-Output 'no_uninstaller_found'
@@ -31,9 +43,17 @@ if ($app.appType -eq 'win32' -and $app.uninstallKey) {
 }
 
 if ($app.packageName) {
-    Get-AppxPackage -Name $app.packageName -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
-    Write-Output "uninstalled_appx:$($app.packageName)"
-    exit 0
+    $result = Remove-SafeAppxPackage -PackageName $app.packageName
+    if ($result.removed) {
+        Write-Output "uninstalled_appx:$($app.packageName)"
+        exit 0
+    }
+    if ($result.status -eq 'system_app_cannot_remove') {
+        Write-Output 'system_app_cannot_remove:This app is part of Windows and cannot be uninstalled.'
+        exit 1
+    }
+    Write-Output 'no_uninstaller_found'
+    exit 1
 }
 
 Write-Output 'no_uninstaller_found'

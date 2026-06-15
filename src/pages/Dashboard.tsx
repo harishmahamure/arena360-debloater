@@ -5,11 +5,11 @@ export function DashboardPage() {
   const {
     scanReport,
     resourceReport,
+    tweaks,
     loading,
     runScan,
     selectedIds,
     applySelected,
-    lastApplyResult,
     error,
     setTab,
   } = useDebloatStore();
@@ -30,7 +30,7 @@ export function DashboardPage() {
             disabled={loading}
             className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-50"
           >
-            {loading ? "Scanning..." : "Scan now"}
+            {loading ? "Scanning (system + background)..." : "Scan now"}
           </button>
           <button
             type="button"
@@ -53,8 +53,11 @@ export function DashboardPage() {
         <>
           <ScanSummary
             report={scanReport}
+            tweaks={tweaks}
             highUsageCount={resourceReport?.highUsageCount}
+            resourceEntries={resourceReport?.entries}
             onViewBackgroundUsage={() => setTab("background_usage")}
+            onNavigate={setTab}
           />
           <p className="text-xs text-slate-500">
             Last scanned: {new Date(scanReport.scannedAt).toLocaleString()}
@@ -63,17 +66,6 @@ export function DashboardPage() {
       ) : (
         <div className="rounded-xl border border-dashed border-slate-700 p-12 text-center text-slate-500">
           Run a scan to see your system debloat report.
-        </div>
-      )}
-
-      {lastApplyResult && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-          <p className="font-medium text-emerald-200">
-            Applied {lastApplyResult.successCount} tweak(s) successfully
-          </p>
-          {lastApplyResult.requiresReboot && (
-            <p className="mt-1 text-sm text-amber-200">A system reboot is recommended.</p>
-          )}
         </div>
       )}
     </div>

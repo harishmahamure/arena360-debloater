@@ -146,24 +146,12 @@ impl Reverter {
             });
         }
 
-        let output = std::process::Command::new("powershell")
-            .args([
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                &script.to_string_lossy(),
-                "-SnapshotJson",
-                snapshot,
-            ])
-            .output()
-            .map_err(|e| EngineError::Script(format!("revert failed: {e}")))?;
+        let output = powershell::run_script_with_args(
+            &script,
+            &["-SnapshotJson", snapshot],
+            120,
+        )?;
 
-        Ok(powershell::ScriptResult {
-            success: output.status.success(),
-            stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-            stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
-            exit_code: output.status.code().unwrap_or(-1),
-        })
+        Ok(output)
     }
 }

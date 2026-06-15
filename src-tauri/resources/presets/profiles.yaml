@@ -31,17 +31,46 @@ presets:
 
   - id: gaming
     name: Gaming Profile
-    description: Removes Xbox bloat, optimizes services, and reduces background overhead.
+    description: FPS-focused debloat — removes bloat apps, enables Game Mode, disables capture overhead, and switches to high performance power.
     targetUser: Gamers
     tweakIds:
       - remove-xbox-app
       - remove-clipchamp
       - remove-news
       - remove-weather
+      - remove-teams
+      - remove-outlook
+      - remove-todo
+      - remove-dev-home
+      - remove-copilot-app
       - disable-sysmain
       - disable-xbox-live-auth
+      - disable-diagtrack
+      - disable-onedrive-startup
       - disable-widgets
       - disable-chat-taskbar
       - disable-copilot-button
+      - disable-game-dvr
+      - enable-game-mode
+      - disable-transparency
+      - disable-background-apps
+      - enable-high-performance-power
       - clear-temp-files
       - clear-delivery-optimization
+
+  - id: performance
+    name: Performance Profile
+    description: Reduce CPU, RAM, network, and disk overhead from background Windows features.
+    targetUser: Power users
+    tweakIds:
+      - disable-sysmain
+      - disable-background-apps
+      - disable-search-indexing
+      - disable-do-upload
+      - disable-hibernate
+      - enable-compact-os
+      - disable-superfetch-tasks
+      - limit-wu-bandwidth
+      - clear-temp-files
+      - clear-delivery-optimization
+      - enable-storage-sense

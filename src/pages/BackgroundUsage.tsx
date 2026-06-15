@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ResourceActionBar } from "../components/ResourceActionBar";
-import { ResourceTable } from "../components/ResourceTable";
+import { ResourceTable, type ResourceFilterMode } from "../components/ResourceTable";
 import type { PreviewResourceItem, ResourceAction } from "../lib/types";
 import { useDebloatStore } from "../stores/debloatStore";
 
@@ -18,6 +18,7 @@ export function BackgroundUsagePage() {
 
   const [preview, setPreview] = useState<PreviewResourceItem[] | null>(null);
   const [pendingAction, setPendingAction] = useState<ResourceAction | null>(null);
+  const [filterMode, setFilterMode] = useState<ResourceFilterMode>("all");
 
   useEffect(() => {
     scanResources();
@@ -36,8 +37,8 @@ export function BackgroundUsagePage() {
   };
 
   const confirmAction = async () => {
-    if (!pendingAction) return;
-    await applyResourceAction(pendingAction);
+    if (!pendingAction || !preview) return;
+    await applyResourceAction(pendingAction, preview);
     setPreview(null);
     setPendingAction(null);
   };
@@ -48,7 +49,7 @@ export function BackgroundUsagePage() {
         <div>
           <h2 className="text-2xl font-semibold text-slate-100">Background Usage</h2>
           <p className="text-sm text-slate-400">
-            Live scan of CPU, RAM, and GPU usage by background services and apps.
+            Live scan of CPU, RAM, GPU, disk I/O, and network activity by background apps and services.
           </p>
         </div>
         <button
@@ -59,6 +60,34 @@ export function BackgroundUsagePage() {
         >
           {loading ? "Scanning (5s sample)..." : "Scan now"}
         </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            ["all", "All"],
+            ["cpu", "CPU heavy (>1%)"],
+            ["ram", "RAM heavy (>200 MB)"],
+            ["network", "Network (≥5 conns)"],
+            ["disk", "Disk I/O (≥0.5 MB/s)"],
+            ["gaming", "Gaming GPU"],
+          ] as const
+        ).map(([mode, label]) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => setFilterMode(mode)}
+            className={`rounded-lg px-3 py-1.5 text-sm ${
+              filterMode === mode
+                ? mode === "gaming"
+                  ? "bg-amber-600/30 text-amber-200"
+                  : "bg-sky-600/30 text-sky-200"
+                : "border border-slate-700 text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {error && (
@@ -86,6 +115,7 @@ export function BackgroundUsagePage() {
         selectedIds={selectedResourceIds}
         onToggle={toggleResourceSelection}
         onSelectAll={selectAllResources}
+        filterMode={filterMode}
       />
 
       {preview && (

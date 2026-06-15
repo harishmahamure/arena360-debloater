@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
 
 use chrono::Utc;
 use tauri::AppHandle;
@@ -30,7 +29,7 @@ impl InstalledAppScanner {
         }
 
         let script = paths::scripts_dir(app).join("scan/list-installed-apps.ps1");
-        let output = run_script(&script)?;
+        let output = powershell::run_script(&script, 120)?;
 
         if !output.success && output.stdout.is_empty() {
             return Err(EngineError::Script(output.stderr));
@@ -51,34 +50,6 @@ impl InstalledAppScanner {
             bloat_count: payload.bloat_count,
         })
     }
-}
-
-fn run_script(script: &PathBuf) -> Result<super::powershell::ScriptResult, EngineError> {
-    if !script.exists() {
-        return Err(EngineError::Script(format!(
-            "script not found: {}",
-            script.display()
-        )));
-    }
-
-    let script_str = script.to_string_lossy();
-    let output = std::process::Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            script_str.as_ref(),
-        ])
-        .output()
-        .map_err(|e| EngineError::Script(format!("failed to spawn powershell: {e}")))?;
-
-    Ok(super::powershell::ScriptResult {
-        success: output.status.success(),
-        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
-        exit_code: output.status.code().unwrap_or(-1),
-    })
 }
 
 pub fn apps_map(apps: &[InstalledApp]) -> HashMap<String, InstalledApp> {

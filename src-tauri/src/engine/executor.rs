@@ -1,11 +1,12 @@
 use tauri::AppHandle;
 
 use super::catalog::TweakCatalog;
+use super::elevation;
 use super::error::EngineError;
 use super::logger::ChangeLogger;
 use super::models::{ApplyResult, ApplyResultItem, PreviewItem, SessionLog};
 use super::paths;
-use super::powershell::{create_restore_point, run_script};
+use super::powershell::{self, create_restore_point, run_script};
 use super::reverter::Reverter;
 
 pub struct Executor;
@@ -25,6 +26,7 @@ impl Executor {
                 category: tweak.category.clone(),
                 risk: tweak.risk,
                 action: format!("Run apply script: {}", tweak.apply_script),
+                description: tweak.description.clone(),
                 script_path: paths::resolve_script(app, &tweak.apply_script)
                     .to_string_lossy()
                     .to_string(),
@@ -43,6 +45,10 @@ impl Executor {
         tweak_ids: &[String],
         create_restore: bool,
     ) -> Result<ApplyResult, EngineError> {
+        if powershell::is_windows() && !elevation::is_elevated() {
+            return Err(EngineError::ElevationRequired);
+        }
+
         let tweaks = catalog.get_many(tweak_ids)?;
         let restore_point_created = if create_restore {
             Self::create_restore_point("Debloater Session")?

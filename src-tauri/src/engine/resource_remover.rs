@@ -1,6 +1,7 @@
 use tauri::AppHandle;
 
 use super::error::EngineError;
+use super::elevation;
 use super::executor::Executor;
 use super::logger::ChangeLogger;
 use super::models::{
@@ -56,6 +57,10 @@ impl ResourceRemover {
         action: ResourceAction,
         create_restore: bool,
     ) -> Result<ApplyResult, EngineError> {
+        if powershell::is_windows() && !elevation::is_elevated() {
+            return Err(EngineError::ElevationRequired);
+        }
+
         let restore_point_created = if create_restore {
             Executor::create_restore_point("Debloater Resource Action")?
         } else {
@@ -147,7 +152,7 @@ impl ResourceRemover {
     ) -> Result<(bool, String, Option<String>), EngineError> {
         let script = paths::scripts_dir(app).join("remediation/stop-resource.ps1");
         let json = serde_json::to_string(entry).map_err(|e| EngineError::Script(e.to_string()))?;
-        let result = run_script_with_entry(&script, &json)?;
+        let result = powershell::run_script_with_args(&script, &["-EntryJson", &json], 120)?;
         let snapshot = if result.success {
             Some(result.stdout.clone())
         } else {
@@ -173,7 +178,7 @@ impl ResourceRemover {
         }
         let script = paths::scripts_dir(app).join("remediation/uninstall-resource.ps1");
         let json = serde_json::to_string(entry).map_err(|e| EngineError::Script(e.to_string()))?;
-        let result = run_script_with_entry(&script, &json)?;
+        let result = powershell::run_script_with_args(&script, &["-EntryJson", &json], 120)?;
         Ok((
             result.success,
             if result.stdout.is_empty() {
@@ -184,45 +189,4 @@ impl ResourceRemover {
             None,
         ))
     }
-}
-
-fn run_script_with_entry(
-    script: &std::path::Path,
-    entry_json: &str,
-) -> Result<powershell::ScriptResult, EngineError> {
-    if !powershell::is_windows() {
-        return Ok(powershell::ScriptResult {
-            success: true,
-            stdout: r#"{"services":[],"startup":[]}"#.into(),
-            stderr: String::new(),
-            exit_code: 0,
-        });
-    }
-
-    if !script.exists() {
-        return Err(EngineError::Script(format!(
-            "script not found: {}",
-            script.display()
-        )));
-    }
-
-    let output = std::process::Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            &script.to_string_lossy(),
-            "-EntryJson",
-            entry_json,
-        ])
-        .output()
-        .map_err(|e| EngineError::Script(format!("failed to spawn powershell: {e}")))?;
-
-    Ok(powershell::ScriptResult {
-        success: output.status.success(),
-        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
-        exit_code: output.status.code().unwrap_or(-1),
-    })
 }

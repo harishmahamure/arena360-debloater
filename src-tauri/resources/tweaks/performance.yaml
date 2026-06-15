@@ -1,0 +1,67 @@
+tweaks:
+  - id: disable-search-indexing
+    name: Disable Windows Search Indexing
+    category: performance
+    risk: moderate
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Stops the Windows Search indexer to reduce CPU and disk I/O. Start menu search may be slower.
+    warning: File and Start menu search will be slower until reverted.
+    detectScript: scripts/performance/disable-search-indexing-detect.ps1
+    applyScript: scripts/performance/disable-search-indexing-apply.ps1
+    revertScript: scripts/performance/disable-search-indexing-revert.ps1
+  - id: disable-do-upload
+    name: Disable Delivery Optimization Upload
+    category: performance
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Stops Windows from uploading update packages to other PCs on your network or the internet.
+    warning: null
+    detectScript: scripts/performance/disable-do-upload-detect.ps1
+    applyScript: scripts/performance/disable-do-upload-apply.ps1
+    revertScript: scripts/performance/disable-do-upload-revert.ps1
+  - id: disable-hibernate
+    name: Disable Hibernate (Free Disk Space)
+    category: performance
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables hibernate and removes hiberfil.sys to reclaim disk space equal to your installed RAM.
+    warning: Fast startup and hibernate will no longer be available.
+    detectScript: scripts/performance/disable-hibernate-detect.ps1
+    applyScript: scripts/performance/disable-hibernate-apply.ps1
+    revertScript: scripts/performance/disable-hibernate-revert.ps1
+  - id: enable-compact-os
+    name: Enable Compact OS
+    category: performance
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Compresses system files to reduce Windows footprint on disk with minimal performance impact on SSDs.
+    warning: First run may take several minutes.
+    detectScript: scripts/performance/enable-compact-os-detect.ps1
+    applyScript: scripts/performance/enable-compact-os-apply.ps1
+    revertScript: scripts/performance/enable-compact-os-revert.ps1
+  - id: disable-ndis-captures
+    name: Disable Wi-Fi Sense Auto-Connect
+    category: performance
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Prevents automatic connection to shared Wi-Fi hotspots and reduces related background network activity.
+    warning: null
+    detectScript: scripts/performance/disable-ndis-captures-detect.ps1
+    applyScript: scripts/performance/disable-ndis-captures-apply.ps1
+    revertScript: scripts/performance/disable-ndis-captures-revert.ps1
+  - id: disable-superfetch-tasks
+    name: Disable SysMain Scheduled Tasks
+    category: performance
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Disables SysMain maintenance tasks that preload apps and run swap assessments in the background.
+    warning: Complements disabling the SysMain service under Services.
+    detectScript: scripts/performance/disable-superfetch-tasks-detect.ps1
+    applyScript: scripts/performance/disable-superfetch-tasks-apply.ps1
+    revertScript: scripts/performance/disable-superfetch-tasks-revert.ps1

@@ -47,7 +47,8 @@ export function InstalledAppsPage() {
   };
 
   const confirmUninstall = async () => {
-    await bulkUninstallApps();
+    if (!preview) return;
+    await bulkUninstallApps(preview);
     setPreview(null);
   };
 

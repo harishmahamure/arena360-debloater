@@ -1,6 +1,7 @@
 use tauri::AppHandle;
 
 use super::error::EngineError;
+use super::elevation;
 use super::executor::Executor;
 use super::logger::ChangeLogger;
 use super::models::{ApplyResult, ApplyResultItem, InstalledApp, PreviewAppUninstall};
@@ -38,6 +39,10 @@ impl AppUninstaller {
         apps: &[InstalledApp],
         create_restore: bool,
     ) -> Result<ApplyResult, EngineError> {
+        if powershell::is_windows() && !elevation::is_elevated() {
+            return Err(EngineError::ElevationRequired);
+        }
+
         let restore_point_created = if create_restore {
             Executor::create_restore_point("Debloater Bulk App Uninstall")?
         } else {
@@ -130,25 +135,6 @@ fn run_uninstall(
 
     let json =
         serde_json::to_string(installed_app).map_err(|e| EngineError::Script(e.to_string()))?;
-    let script_str = script.to_string_lossy();
 
-    let output = std::process::Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            script_str.as_ref(),
-            "-AppJson",
-            &json,
-        ])
-        .output()
-        .map_err(|e| EngineError::Script(format!("failed to spawn powershell: {e}")))?;
-
-    Ok(powershell::ScriptResult {
-        success: output.status.success(),
-        stdout: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-        stderr: String::from_utf8_lossy(&output.stderr).trim().to_string(),
-        exit_code: output.status.code().unwrap_or(-1),
-    })
+    powershell::run_script_with_args(&script, &["-AppJson", &json], 120)
 }

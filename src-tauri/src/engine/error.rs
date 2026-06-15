@@ -20,7 +20,7 @@ pub enum EngineError {
     #[error("session error: {0}")]
     Session(String),
 
-    #[error("elevation required")]
+    #[error("administrator privileges required — restart the app using 'Elevate for system changes'")]
     ElevationRequired,
 
     #[error("platform not supported: {0}")]

@@ -1,13 +1,22 @@
 param([string]$EntryJson)
 
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'SilentlyContinue'
+. (Join-Path $PSScriptRoot 'appx-remove-helper.ps1')
+
 $entry = $EntryJson | ConvertFrom-Json
 
 if ($entry.packageName) {
-    Get-AppxPackage -Name $entry.packageName -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
-    Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like "*$($entry.packageName)*" | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
-    Write-Output "uninstalled_appx:$($entry.packageName)"
-    exit 0
+    $result = Remove-SafeAppxPackage -PackageName $entry.packageName
+    if ($result.removed) {
+        Write-Output "uninstalled_appx:$($entry.packageName)"
+        exit 0
+    }
+    if ($result.status -eq 'system_app_cannot_remove') {
+        Write-Output 'system_app_cannot_remove:This app is part of Windows and cannot be uninstalled.'
+        exit 1
+    }
+    Write-Output 'no_uninstaller_found'
+    exit 1
 }
 
 $uninstallRoots = @(

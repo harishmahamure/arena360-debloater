@@ -95,6 +95,8 @@ fn summarize(tweak_ids: &[String], catalog: &TweakCatalog) -> PresetSummary {
         cleanup: 0,
         windows_update: 0,
         tasks: 0,
+        gaming: 0,
+        performance: 0,
         total: tweak_ids.len() as u32,
     };
 
@@ -108,6 +110,8 @@ fn summarize(tweak_ids: &[String], catalog: &TweakCatalog) -> PresetSummary {
                 "cleanup" => summary.cleanup += 1,
                 "windows_update" => summary.windows_update += 1,
                 "tasks" => summary.tasks += 1,
+                "gaming" => summary.gaming += 1,
+                "performance" => summary.performance += 1,
                 _ => {}
             }
         }

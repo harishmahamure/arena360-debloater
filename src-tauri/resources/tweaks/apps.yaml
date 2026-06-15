@@ -76,3 +76,113 @@ tweaks:
     detectScript: scripts/apps/remove-phone-link-detect.ps1
     applyScript: scripts/apps/remove-phone-link-apply.ps1
     revertScript: scripts/apps/remove-phone-link-revert.ps1
+  - id: remove-teams
+    name: Remove Microsoft Teams
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Microsoft Teams (new and legacy) for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-teams-detect.ps1
+    applyScript: scripts/apps/remove-teams-apply.ps1
+    revertScript: scripts/apps/remove-teams-revert.ps1
+  - id: remove-outlook
+    name: Remove Outlook (new)
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes the new Outlook app for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-outlook-detect.ps1
+    applyScript: scripts/apps/remove-outlook-apply.ps1
+    revertScript: scripts/apps/remove-outlook-revert.ps1
+  - id: remove-todo
+    name: Remove Microsoft To Do
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Microsoft To Do for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-todo-detect.ps1
+    applyScript: scripts/apps/remove-todo-apply.ps1
+    revertScript: scripts/apps/remove-todo-revert.ps1
+  - id: remove-dev-home
+    name: Remove Dev Home
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Windows Dev Home for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-dev-home-detect.ps1
+    applyScript: scripts/apps/remove-dev-home-apply.ps1
+    revertScript: scripts/apps/remove-dev-home-revert.ps1
+  - id: remove-power-automate
+    name: Remove Power Automate
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Power Automate Desktop for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-power-automate-detect.ps1
+    applyScript: scripts/apps/remove-power-automate-apply.ps1
+    revertScript: scripts/apps/remove-power-automate-revert.ps1
+  - id: remove-groove
+    name: Remove Groove Music
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Groove Music for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-groove-detect.ps1
+    applyScript: scripts/apps/remove-groove-apply.ps1
+    revertScript: scripts/apps/remove-groove-revert.ps1
+  - id: remove-onenote
+    name: Remove OneNote
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes the Store OneNote app for current and new users.
+    warning: Desktop OneNote is not affected.
+    detectScript: scripts/apps/remove-onenote-detect.ps1
+    applyScript: scripts/apps/remove-onenote-apply.ps1
+    revertScript: scripts/apps/remove-onenote-revert.ps1
+  - id: remove-skype
+    name: Remove Skype
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes Skype for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-skype-detect.ps1
+    applyScript: scripts/apps/remove-skype-apply.ps1
+    revertScript: scripts/apps/remove-skype-revert.ps1
+  - id: remove-copilot-app
+    name: Remove Copilot App
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes the standalone Copilot app for current and new users.
+    warning: Does not remove the taskbar Copilot button tweak.
+    detectScript: scripts/apps/remove-copilot-app-detect.ps1
+    applyScript: scripts/apps/remove-copilot-app-apply.ps1
+    revertScript: scripts/apps/remove-copilot-app-revert.ps1
+  - id: remove-office-hub
+    name: Remove Microsoft 365 Hub
+    category: apps
+    risk: safe
+    requiresReboot: false
+    win11BuildMin: 22000
+    description: Removes the Microsoft 365 / Office hub app for current and new users.
+    warning: null
+    detectScript: scripts/apps/remove-office-hub-detect.ps1
+    applyScript: scripts/apps/remove-office-hub-apply.ps1
+    revertScript: scripts/apps/remove-office-hub-revert.ps1

@@ -23,6 +23,14 @@ function Test-FrameworkPackage($name) {
     return $false
 }
 
+function Test-SystemAppxPackage($pkg) {
+    if (-not $pkg) { return $false }
+    if ($pkg.InstallLocation -and $pkg.InstallLocation -match '(?i)\\Windows\\SystemApps\\') { return $true }
+    if ($pkg.IsFramework) { return $true }
+    if ($pkg.SignatureKind -eq 'System') { return $true }
+    return $false
+}
+
 function Test-BloatApp($name, $publisher) {
     foreach ($p in $bloatPackagePatterns) {
         if ($name -like "*$p*") { return $true }
@@ -50,6 +58,7 @@ try {
     if (-not $appxList) { $appxList = Get-AppxPackage -ErrorAction SilentlyContinue }
     foreach ($pkg in $appxList) {
         if (Test-FrameworkPackage $pkg.Name) { continue }
+        $isSystem = Test-SystemAppxPackage $pkg
         $id = "appx:$($pkg.Name)|pkg:$($pkg.Name)"
         if ($seen.ContainsKey($id)) { continue }
         $seen[$id] = $true
@@ -62,11 +71,11 @@ try {
             packageName = $pkg.Name
             uninstallKey = $null
             sizeMb = Get-FolderSizeMb $pkg.InstallLocation
-            canUninstall = $true
-            isProtected = $false
-            isBloat = (Test-BloatApp $pkg.Name $publisher)
-            risk = 'safe'
-            warning = $null
+            canUninstall = -not $isSystem
+            isProtected = $isSystem
+            isBloat = (-not $isSystem) -and (Test-BloatApp $pkg.Name $publisher)
+            risk = if ($isSystem) { 'advanced' } else { 'safe' }
+            warning = if ($isSystem) { 'Part of Windows — cannot be uninstalled' } else { $null }
         }
     }
 } catch {}
@@ -111,7 +120,7 @@ foreach ($root in $roots) {
 $list = $apps.Values | Sort-Object displayName
 
 [ordered]@{
-    apps = $list
+    apps = @($list)
     scannedAt = (Get-Date).ToUniversalTime().ToString('o')
     totalCount = $list.Count
     bloatCount = @($list | Where-Object { $_.isBloat }).Count
