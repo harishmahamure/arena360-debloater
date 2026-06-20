@@ -29,14 +29,13 @@ impl InstalledAppScanner {
         }
 
         let script = paths::scripts_dir(app).join("scan/list-installed-apps.ps1");
-        let output = powershell::run_script(&script, 120)?;
+        let output = powershell::run_script(&script, 180)?;
 
         if !output.success && output.stdout.is_empty() {
             return Err(EngineError::Script(output.stderr));
         }
 
-        let mut payload: ScanPayload = serde_json::from_str(&output.stdout)
-            .map_err(|e| EngineError::Script(format!("invalid apps JSON: {e}")))?;
+        let mut payload = parse_scan_stdout(&output.stdout, &output.stderr)?;
 
         let protected_path = paths::resources_root(app).join("protected.json");
         if let Ok(registry) = ProtectedRegistry::load(&protected_path) {
@@ -50,6 +49,29 @@ impl InstalledAppScanner {
             bloat_count: payload.bloat_count,
         })
     }
+}
+
+fn parse_scan_stdout(stdout: &str, stderr: &str) -> Result<ScanPayload, EngineError> {
+    let trimmed = stdout.trim_start_matches('\u{feff}').trim();
+    let json = if trimmed.starts_with('{') {
+        trimmed.to_string()
+    } else if let Some(start) = trimmed.find('{') {
+        if let Some(end) = trimmed.rfind('}') {
+            trimmed[start..=end].to_string()
+        } else {
+            trimmed.to_string()
+        }
+    } else {
+        trimmed.to_string()
+    };
+
+    serde_json::from_str(&json).map_err(|e| {
+        let preview: String = json.chars().take(200).collect();
+        let stderr_preview: String = stderr.chars().take(200).collect();
+        EngineError::Script(format!(
+            "invalid apps JSON: {e} (stdout preview: {preview:?}, stderr preview: {stderr_preview:?})"
+        ))
+    })
 }
 
 pub fn apps_map(apps: &[InstalledApp]) -> HashMap<String, InstalledApp> {
@@ -127,6 +149,12 @@ fn mock_report() -> InstalledAppsReport {
 mod tests {
     use super::*;
 
+    fn sample_app_json(id: &str, name: &str) -> String {
+        format!(
+            r#"{{"id":"{id}","displayName":"{name}","publisher":"Test","appType":"appx","packageName":"{name}","sizeMb":0,"canUninstall":true,"isProtected":false,"isBloat":false,"risk":"safe"}}"#
+        )
+    }
+
     #[test]
     fn mock_report_has_apps() {
         let report = mock_report();
@@ -134,5 +162,46 @@ mod tests {
         assert!(report.bloat_count >= 1);
         let map = apps_map(&report.apps);
         assert_eq!(map.len(), report.apps.len());
+    }
+
+    #[test]
+    fn parse_scan_stdout_multi_app_array() {
+        let stdout = format!(
+            r#"{{"apps":[{},{}],"scannedAt":"2026-01-01T00:00:00.0000000Z","totalCount":2,"bloatCount":0}}"#,
+            sample_app_json("appx:a|pkg:a", "AppA"),
+            sample_app_json("appx:b|pkg:b", "AppB"),
+        );
+        let payload = parse_scan_stdout(&stdout, "").expect("parse multi-app JSON");
+        assert_eq!(payload.apps.len(), 2);
+        assert_eq!(payload.total_count, 2);
+    }
+
+    #[test]
+    fn parse_scan_stdout_empty_apps() {
+        let stdout =
+            r#"{"apps":[],"scannedAt":"2026-01-01T00:00:00.0000000Z","totalCount":0,"bloatCount":0}"#;
+        let payload = parse_scan_stdout(stdout, "").expect("parse empty apps JSON");
+        assert!(payload.apps.is_empty());
+        assert_eq!(payload.total_count, 0);
+    }
+
+    #[test]
+    fn parse_scan_stdout_rejects_null_total_count() {
+        let stdout = format!(
+            r#"{{"apps":[{}],"scannedAt":"2026-01-01T00:00:00.0000000Z","totalCount":null,"bloatCount":0}}"#,
+            sample_app_json("appx:a|pkg:a", "AppA"),
+        );
+        let err = parse_scan_stdout(&stdout, "").unwrap_err();
+        assert!(err.to_string().contains("invalid apps JSON"));
+    }
+
+    #[test]
+    fn parse_scan_stdout_extracts_json_with_prefix() {
+        let stdout = format!(
+            "warning: something\n{{\"apps\":[{}],\"scannedAt\":\"2026-01-01T00:00:00.0000000Z\",\"totalCount\":1,\"bloatCount\":0}}",
+            sample_app_json("appx:a|pkg:a", "AppA"),
+        );
+        let payload = parse_scan_stdout(&stdout, "").expect("parse JSON with prefix");
+        assert_eq!(payload.apps.len(), 1);
     }
 }

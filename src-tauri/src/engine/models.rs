@@ -272,13 +272,16 @@ pub struct InstalledApp {
     pub display_name: String,
     pub publisher: String,
     pub app_type: String,
+    #[serde(default)]
     pub package_name: Option<String>,
+    #[serde(default)]
     pub uninstall_key: Option<String>,
     pub size_mb: f64,
     pub can_uninstall: bool,
     pub is_protected: bool,
     pub is_bloat: bool,
     pub risk: RiskLevel,
+    #[serde(default)]
     pub warning: Option<String>,
 }
 

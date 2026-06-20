@@ -85,6 +85,7 @@ fn output_to_result(output: Output) -> ScriptResult {
     }
 }
 
+#[cfg(windows)]
 fn run_command_with_timeout(mut cmd: Command, timeout_secs: u64) -> Result<ScriptResult, EngineError> {
     let timeout = Duration::from_secs(timeout_secs.max(1));
     let mut child = cmd

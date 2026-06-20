@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'SilentlyContinue'
+$ProgressPreference = 'SilentlyContinue'
 
 $frameworkPatterns = @(
     'Microsoft.VCLibs',
@@ -41,14 +42,6 @@ function Test-BloatApp($name, $publisher) {
     return $false
 }
 
-function Get-FolderSizeMb($path) {
-    if (-not $path -or -not (Test-Path $path)) { return 0 }
-    try {
-        $bytes = (Get-ChildItem -Path $path -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
-        return [math]::Round($bytes / 1MB, 2)
-    } catch { return 0 }
-}
-
 $apps = @{}
 $seen = @{}
 
@@ -70,7 +63,7 @@ try {
             appType = 'appx'
             packageName = $pkg.Name
             uninstallKey = $null
-            sizeMb = Get-FolderSizeMb $pkg.InstallLocation
+            sizeMb = 0
             canUninstall = -not $isSystem
             isProtected = $isSystem
             isBloat = (-not $isSystem) -and (Test-BloatApp $pkg.Name $publisher)
@@ -117,10 +110,10 @@ foreach ($root in $roots) {
     }
 }
 
-$list = $apps.Values | Sort-Object displayName
+$list = @($apps.Values | Sort-Object displayName)
 
 [ordered]@{
-    apps = @($list)
+    apps = $list
     scannedAt = (Get-Date).ToUniversalTime().ToString('o')
     totalCount = $list.Count
     bloatCount = @($list | Where-Object { $_.isBloat }).Count
